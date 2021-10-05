@@ -11,128 +11,143 @@ namespace KnightsTour
     {
 
         private int attemptedMoves = 0;
-        private SquareFactory sf = new();
-        private BoardFactory bf = new();
+        private CoordFactory cf = null;
+        private SquareFactory sf = null;
+        private BoardFactory bf = null;
 
-        private Coord _startSquare = new();
+        private Square _startLocation = new();
         private Coord _lastSquare = new();
         private Board _boardGrid = new();
 
         private List<Coord> KnightMoves = new();
-        private int[,] KnightMovesArray =
-        {
-            {2,1},{1,2},{-1,2},{-2,1},{-2,-1},{-1,-2},{1,-2},{2,-1}
-        };
+        private int[,] KnightMovesArray = { { 2, 1 }, { 1, 2 }, { -1, 2 }, { -2, 1 }, { -2, -1 }, { -1, -2 }, { 1, -2 }, { 2, -1 } };
 
-
-        public KnightsTour_1_Closed(int boardSize = 8)
+        public KnightsTour_1_Closed(int boardSize = 8, int startX = 0, int startY = 0)
         {
-            _boardGrid = bf.GetBoard(boardSize);
+            Random r = new(55);
+            cf = new();
+            sf = new(cf);
+            bf = new(sf, r);
+
+            _boardGrid = bf.GetBoard(boardSize, startX, startY);
             KnightMoves = sf.FromRange(KnightMovesArray);
         }
 
-        public void FindKT(int startX = 0, int startY = 0)
+        public void FindKT()
         {
             _boardGrid.SetGrid(-1);
-            _startSquare = sf.GetNewCoord(startX, startY);
-            _boardGrid.SetValue(_startSquare, 0); //start is visited
+            _boardGrid.SetCurrent(_boardGrid.StartLocation,0);
+            //_startLocation = _boardGrid.StartLocation;
+            //_boardGrid.SetMoveOrder(0); //start is visited
             //recursively try all possible legal moves. Backtrack on dead end solutions.
-            if (!solveKTUtil(_startSquare, 1))
+            if (!solveKTUtil(_boardGrid, 1))
             {
-                Console.WriteLine("No solution found for {0}", _startSquare.ToString());
+                Console.WriteLine("No solution found for {0}", _boardGrid.StartLocation.ToString());
             }
             else
             {
                 _boardGrid.PrintBoard();
-                Console.WriteLine("Ending_lastSquare {0}", _lastSquare.MyToString());
-                if (_isClosingSquare(_lastSquare))
-                    Console.WriteLine("Closed tour");
-                else
-                    Console.WriteLine("Open tour");
+                //Console.WriteLine("Ending_lastSquare {0}", _lastSquare.ToString());
+                //if (_isClosingSquare(_lastSquare))
+                //    Console.WriteLine("Closed tour");
+                //else
+                //    Console.WriteLine("Open tour");
                 Console.WriteLine("Total attempted moves {0}", attemptedMoves);
             }
         }
 
-        private bool solveKTUtil(Coord square, int moveCount)
+        private bool solveKTUtil(Board board, int moveCount)
         {
             attemptedMoves++;
             if (attemptedMoves % 1000000 == 0)
                 Console.WriteLine($"Attempted {attemptedMoves} moves"); //update the user on progress every 1 million moves
-            Coord next_move; //location for the next move in the recursion.
-
+            //Coord next_move; //location for the next move in the recursion.
             //check to see if we have solved the game.
 
-            if (_isClosingSquare(square) && moveCount > 3)
+            if (board.isClosingSquare() && moveCount > 3)
             {
-                _lastSquare = square;
+                _lastSquare = board.GetCurrentLocation();
                 return true;
             }
 
-            if (moveCount == _boardGrid.TotalSquares)
+            if (moveCount == board.TotalSquares)
             {
-                _lastSquare = square;
+                _lastSquare = board.GetCurrentLocation();
                 return true;
             }
 
-            if (moveCount == _boardGrid.TotalSquares - 1) //last move
-            {
-
-                if (_isClosingSquare(_boardGrid.LastSquare()))
-                {
-                    return true;
-                }
-                else
-                    return false;
-            }
+            if (moveCount == board.TotalSquares - 1) //last move
+                return board.isClosingSquare();
 
 
             //cycle through all of the possible next moves for the knight.
-            for (int k = 0; k < 8; k++)
+            Square currentSquare = board.CopyCurrentSquare();
+            foreach (Coord move in currentSquare.CopyMoves())
             {
-                next_move = square.Add(KnightMoves[k]);
-
-                if (_boardGrid.safeSquare(next_move))
+                if (!board.GetSquareByPosition(move).IsVisited)
                 {
-                    _boardGrid.SetValue(next_move, moveCount);
-                    if (solveKTUtil(next_move, moveCount + 1))
+                    board.SetCurrent(move,moveCount);
+                    if (solveKTUtil(board, moveCount + 1))
                         return true;
                     else
-                        _boardGrid.SetValue(next_move,-1);
+                        board.RollBack(currentSquare);
                 }
             }
+
+            //for (int k = 0; k < 8; k++)
+            //{
+            //    next_move = square.Add(KnightMoves[k]);
+
+            //    if (_boardGrid.safeSquare(next_move))
+            //    {
+            //        _boardGrid.SetMoveOrder(next_move, moveCount);
+            //        if (solveKTUtil(next_move, moveCount + 1))
+            //            return true;
+            //        else
+            //            _boardGrid.SetMoveOrder(next_move,-1);
+            //    }
+            //}
             return false;
         }
 
-        public void TestLandingSquare()
+        public void PrintMoves()
         {
-            List<Coord> t1 = LandingSquares(sf.GetNewCoord(4,4));
-            foreach (Coord item in t1)
-                Console.WriteLine(item.MyToString());
+            foreach (var item in _boardGrid.Grid)
+            {
+                item.PrintMoves();
+            }
         }
 
-        private List<Coord> LandingSquares(Coord startSquare)
-        {
-            List<Coord> moves = new();
+        //public void TestLandingSquare()
+        //{
+        //    List<Coord> t1 = LandingSquares(sf.GetNewCoord(4,4));
+        //    foreach (Coord item in t1)
+        //        Console.WriteLine(item.MyToString());
+        //}
 
-            for (int k = 0; k < 8; k++)
-            {
-                Coord nextSq = startSquare.Add(KnightMoves[k]);
-                if (_boardGrid.validSquare(nextSq))
-                    moves.Add(nextSq);
-            }
-            return moves;
-        }
-        private bool _isClosingSquare(Coord candidate)
-        {
-            foreach (var square in LandingSquares(_startSquare))
-            {
-                if (square.IsEqual(candidate))
-                {
-                    return true;
-                }
-            }
-            return false;
-        }
+        //private List<Coord> LandingSquares(Coord startSquare)
+        //{
+        //    List<Coord> moves = new();
+
+        //    for (int k = 0; k < 8; k++)
+        //    {
+        //        Coord nextSq = startSquare.Add(KnightMoves[k]);
+        //        if (_boardGrid.validSquare(nextSq))
+        //            moves.Add(nextSq);
+        //    }
+        //    return moves;
+        //}
+        //private bool _isClosingSquare(Coord candidate)
+        //{
+        //    foreach (var square in LandingSquares(_startSquare))
+        //    {
+        //        if (square.IsEqual(candidate))
+        //        {
+        //            return true;
+        //        }
+        //    }
+        //    return false;
+        //}
     }
 }
 

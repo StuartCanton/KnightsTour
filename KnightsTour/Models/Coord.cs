@@ -12,7 +12,7 @@ namespace KnightsTour.Models
         public int Y { get; set; } = 0;
     }
 
-    class SquareFactory
+    class CoordFactory
     {
         public Coord GetNewCoord(int x, int y) => new Coord() { X = x, Y = y };
 
@@ -38,7 +38,9 @@ namespace KnightsTour.Models
            return $"({square.X},{square.Y})";
         }
         public static Coord Add(this Coord sq1, Coord sq2) => new() { X = sq1.X + sq2.X, Y = sq1.Y + sq2.Y };
+        public static Coord Add(this Coord sq1, int x, int y) => new() { X = sq1.X + x, Y = sq1.Y + y };
         public static bool IsEqual(this Coord sq1, Coord sq2) => sq1.X == sq2.X && sq1.Y == sq2.Y;
+        public static Coord MakeCopy(this Coord sq) => new Coord() { X = sq.X, Y = sq.Y };
 
     }
 }
