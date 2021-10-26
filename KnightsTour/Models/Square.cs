@@ -9,7 +9,7 @@ namespace KnightsTour.Models
     class Square
     {
         public Coord Position { get; set; }
-        public int Profit { get; set; }
+        public decimal Profit { get; set; }
         public int MoveOrder { get; set; }
         public bool IsVisited { get; set; }
         public bool IsCurrent { get; set; }
@@ -29,12 +29,12 @@ namespace KnightsTour.Models
             _coordFactory = coordFactory;
         }
 
-        public Square GetNewSquare(Coord coord, int profit)
+        public Square GetNewSquare(Coord coord, decimal profit)
         {
             return GetNewSquare(coord.X, coord.Y, profit);
         }
 
-        public Square GetNewSquare(int x, int y, int profit) => new Square() 
+        public Square GetNewSquare(int x, int y, decimal profit) => new Square() 
         { 
             Position = _coordFactory.GetNewCoord(x,y),
             Profit = profit,

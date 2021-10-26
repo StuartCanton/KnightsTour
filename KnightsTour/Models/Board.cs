@@ -14,6 +14,7 @@ namespace KnightsTour.Models
         public Coord StartLocation { get; set; } = new();
         public List<Coord> ClosingCoords { get; set; } = null;
         public Coord CurrentLocation { get; set; } = new();
+        
     }
 
     class BoardFactory
@@ -66,10 +67,18 @@ namespace KnightsTour.Models
                 for (int j = 0; j < size; j++)
                 {
                     //set initial values
-                    Grid[i, j] = _squareFactory.GetNewSquare(i, j, _random.Next(100));
+                    Grid[i, j] = _squareFactory.GetNewSquare(i, j, GenerateRandomProfit());
                 }
             }
             return Grid;
+        }
+
+        private decimal GenerateRandomProfit()
+        {
+            decimal result = 0m;
+            decimal value = _random.Next(1000000);
+            result = value / 100;
+            return result;
         }
     }
 
@@ -193,5 +202,34 @@ namespace KnightsTour.Models
                 if (square.Position.IsEqual(position)) return square.MakeCopy();
             return null;
         }
+        public static decimal CalcProfit(this Board board)
+        {
+            decimal result = 0m;
+            foreach (Square square in board.Grid)
+            {
+                if(square.IsVisited)
+                result += square.Profit;
+                //Console.WriteLine($"profit for square:{square.Position.MyToString()} is: {square.Profit.ToString("N2")}");
+            }
+            return result;
+        }
+
+        //reverse lookup?
+        public static List<Coord> GetReverseLinksToQuad(this Board board, Quadrant FromQuadrant, Quadrant ToQuadrant)
+        {
+            List<Coord> result = new();
+            foreach (Square square in board.Grid)
+            {
+                foreach (Coord destination in square.OutgoingMoves)
+                {
+                    //if(Xaxis.destination.X)
+                    //if(ToQuadrant.contains(destination)
+                    //result.Add(destination);
+                }
+            }
+            return result;
+        }
+
+
     }
 }

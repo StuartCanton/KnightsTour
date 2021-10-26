@@ -14,13 +14,19 @@ namespace KnightsTour
         private CoordFactory cf = null;
         private SquareFactory sf = null;
         private BoardFactory bf = null;
+        private AxisFactory af = null;
+        private Range2DFactory rf = null;
+        private QuadrantFactory qf = null;
+
 
         private Square _startLocation = new();
         private Coord _lastSquare = new();
         private Board _boardGrid = new();
 
-        private List<Coord> KnightMoves = new();
-        private int[,] KnightMovesArray = { { 2, 1 }, { 1, 2 }, { -1, 2 }, { -2, 1 }, { -2, -1 }, { -1, -2 }, { 1, -2 }, { 2, -1 } };
+        private List<Quadrant> _quadrants = new();
+
+        //private List<Coord> KnightMoves = new();
+        //private int[,] KnightMovesArray = { { 2, 1 }, { 1, 2 }, { -1, 2 }, { -2, 1 }, { -2, -1 }, { -1, -2 }, { 1, -2 }, { 2, -1 } };
 
         public KnightsTour_1_Closed(int boardSize = 8, int startX = 0, int startY = 0)
         {
@@ -28,10 +34,16 @@ namespace KnightsTour
             cf = new();
             sf = new(cf);
             bf = new(sf, r);
+            af = new();
+            rf = new(af);
+            qf = new(rf,af);
+            
 
             _boardGrid = bf.GetBoard(boardSize, startX, startY);
-            KnightMoves = sf.FromRange(KnightMovesArray);
+            
         }
+
+
 
         public void FindKT()
         {
@@ -47,7 +59,8 @@ namespace KnightsTour
             else
             {
                 _boardGrid.PrintBoard();
-                //Console.WriteLine("Ending_lastSquare {0}", _lastSquare.ToString());
+                Console.WriteLine("Ending_lastSquare {0}", _lastSquare.MyToString());
+                Console.WriteLine("Total profit: {0:N2}", _boardGrid.CalcProfit());
                 //if (_isClosingSquare(_lastSquare))
                 //    Console.WriteLine("Closed tour");
                 //else
