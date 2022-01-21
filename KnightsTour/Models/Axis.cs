@@ -42,6 +42,7 @@ namespace KnightsTour.Models
 
         public static bool IsEqual(this Axis a1, Axis a2) => a1.Min == a2.Min && a1.Max == a2.Max;
         public static bool IsWithin(this Axis a1, int val) => a1.Min <= val && a1.Max >= val;
+        public static bool DoesContain(this Axis a1, int val) => val >= a1.Min && val <= a1.Max;
         //public static Axis Span(this Axis a1, Axis a2) => new Axis() { Min = a1.Min<a2.Min}
 
         //public static Axis Slice(this Axis range, int start, int end)

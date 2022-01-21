@@ -1,28 +1,30 @@
-﻿using System;
+﻿using KnightsTour;
 
-namespace KnightsTour
-{
-    class Program
-    {
 
-        static void Main(string[] args)
-        {
+//KnightsTour_fromShad KT1 = new(6);
+//KT1.FindKT(0,0);
+KnightsTour_2_Closed KT2 = new(8, 0, 0);
+//KT2.FindKT();
+//KT2.FindQuadPath();
 
-            //KnightsTour_fromShad KT1 = new(6);
-            //KT1.FindKT(0,0);
+MinimumSpanningTree2 MST2 = new();
 
-            KnightsTour_1_Closed KT2 = new(8,0,0);
-            KT2.FindKT();
+//KT2.TestLandingSquare();
+//KT2.PrintMoves();
 
-            
+//using System;
 
-            //KT2.TestLandingSquare();
-            //KT2.PrintMoves();
+//namespace KnightsTour
+//{
+//    class Program
+//    {
 
-            Console.ReadLine();
-        }
+//        static void Main(string[] args)
+//        {
+//            Console.ReadLine();
+//        }
 
- 
 
-    }
-}
+
+//    }
+//}

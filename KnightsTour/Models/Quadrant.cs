@@ -87,16 +87,23 @@ namespace KnightsTour.Models
         }
 
 
+
         public List<Quadrant> GetQuadrants(Board board, EnumQuadrants enumQuadrant)
+        {
+            return GetQuadrants(board.BoardSize);
+        }
+
+
+        public List<Quadrant> GetQuadrants(int boardSize)
         {
             //numberd rowwise 1,2,3,4
             // enums TL,TR,BL,BR
 
-            int size = board.BoardSize / 2;
+            int size = boardSize / 2;
             int total = size * size;
             
-            Axis firstAxis = _axisFactory.GetNewAxis(min: 0, max: size);
-            Axis secondAxis = _axisFactory.GetNewAxis(min: size, max: board.BoardSize);
+            Axis firstAxis = _axisFactory.GetNewAxis(min: 0, max: size-1);
+            Axis secondAxis = _axisFactory.GetNewAxis(min: size, max: boardSize);
 
             List<Quadrant> result = new();
             result.Add(
@@ -140,4 +147,75 @@ namespace KnightsTour.Models
         }
 
     }
+
+    //__________________________________________________________________________________________________________
+    static partial class Extensions
+    {
+        public static void PrintQuadrant(this Quadrant quadrant,Board board)
+        {
+            for (int i = 0; i < board.Grid.GetLength(0); i++)
+            {
+                for (int j = 0; j < board.Grid.GetLength(1); j++)
+                {
+                    Square sq = board.Grid[i, j];
+                    if (quadrant.QuadContains(sq))
+                    {
+                        //string val = sq.MoveOrder.ToString("00");
+                        string val = sq.Profit.ToString("00");
+                        if (val == "-01") val = "  ";
+                        Console.Write(val + " ");
+                    }
+                    else
+                    {
+                        Console.Write("-- ");
+                    }
+
+                }
+                Console.WriteLine();
+            }
+        }
+
+        public static bool QuadContains(this Quadrant quadrant, Square candidate)
+        {
+            return QuadContains(quadrant, candidate.Position);
+        }
+
+        public static bool QuadContains(this Quadrant quadrant, Coord position)
+        {
+            return quadrant.Area.Xaxis.DoesContain(position.X) && quadrant.Area.Yaxis.DoesContain(position.Y);
+            
+        }
+        public static void CreateMaxST(this Quadrant quadrant)
+        {
+            //List<Square> tree
+        }
+        public static List<Square> SortSquares(this Quadrant quadrant, Board board)
+        {
+            List<Square> result = GetSquares(quadrant, board);
+            foreach (var item in result) item.PrintSquare();
+            Console.WriteLine("");
+            result = result.OrderByDescending(e=>e.Profit).ToList();
+            foreach (var item in result) item.PrintSquare();
+ 
+            return result;
+        }
+        public static List<Square> GetSquares(this Quadrant quadrant, Board board)
+        {
+            List<Square> result = new();
+            for (int i = 0; i < board.Grid.GetLength(0); i++)
+            {
+                for (int j = 0; j < board.Grid.GetLength(1); j++)
+                {
+                    Square sq = board.Grid[i, j].MakeCopy();
+                    if (quadrant.QuadContains(sq))
+                    {
+                        result.Add(sq);
+
+                    }
+                }
+            }
+            return result;
+        }
+    }
+
 }

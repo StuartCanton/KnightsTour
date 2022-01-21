@@ -14,17 +14,20 @@ namespace KnightsTour.Models
         public Coord StartLocation { get; set; } = new();
         public List<Coord> ClosingCoords { get; set; } = null;
         public Coord CurrentLocation { get; set; } = new();
+        public List<Quadrant> Quadrants { get; set; } = new();
         
     }
 
     class BoardFactory
     {
         private readonly SquareFactory _squareFactory;
+        private readonly QuadrantFactory _quadrantFactory;
         private readonly Random _random;
 
-        public BoardFactory(SquareFactory squareFactory, Random random)
+        public BoardFactory(SquareFactory squareFactory, QuadrantFactory quadrantFactory , Random random)
         {
             _squareFactory = squareFactory;
+            _quadrantFactory = quadrantFactory;
             _random = random;
         }
 
@@ -41,7 +44,8 @@ namespace KnightsTour.Models
                 BoardSize = size,
                 TotalSquares = size * size,
                 StartLocation = startLocation,
-                ClosingCoords = CalcClosingSquares(startLocation, size)
+                ClosingCoords = CalcClosingSquares(startLocation, size),
+                Quadrants = _quadrantFactory.GetQuadrants(size)
             };
 
             result.ValidateSquares();
@@ -230,6 +234,26 @@ namespace KnightsTour.Models
             return result;
         }
 
+        public static void PrintQuadrants(this Board board)
+        {
+            foreach (var item in board.Quadrants)
+            {
+                Console.WriteLine($"Corner: {item.Corner}");
+                item.PrintQuadrant(board);
+                Console.WriteLine($"totalSquares: {item.TotalSquares}");
+                Console.WriteLine($"MinVisits: {item.MinMaxVisits.Min}");
+            }
+        }
+        public static EnumQuadrants? GetStartingQuad(this Board board)
+        {
+            
+            foreach (var item in board.Quadrants)
+            {
+                if (item.QuadContains(board.StartLocation))
+                    return item.Corner;
+            }
+            return null;
+        }
 
     }
 }

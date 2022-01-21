@@ -1,15 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using KnightsTour.Models;
+using KnightsTour.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace KnightsTour
 {
-    class KnightsTour_1_Closed
+    class KnightsTour_2_Closed
     {
-
         private int attemptedMoves = 0;
         private CoordFactory cf = null;
         private SquareFactory sf = null;
@@ -25,22 +25,19 @@ namespace KnightsTour
 
         private List<Quadrant> _quadrants = new();
 
-        //private List<Coord> KnightMoves = new();
-        //private int[,] KnightMovesArray = { { 2, 1 }, { 1, 2 }, { -1, 2 }, { -2, 1 }, { -2, -1 }, { -1, -2 }, { 1, -2 }, { 2, -1 } };
-
-        public KnightsTour_1_Closed(int boardSize = 8, int startX = 0, int startY = 0)
+        public KnightsTour_2_Closed(int boardSize = 8, int startX = 0, int startY = 0)
         {
             Random r = new(55);
             cf = new();
-            sf = new(cf);           
+            sf = new(cf);            
             af = new();
             rf = new(af);
-            qf = new(rf,af);
-            bf = new(sf,qf, r);
+            qf = new(rf, af);
+            bf = new(sf, qf, r);
 
 
             _boardGrid = bf.GetBoard(boardSize, startX, startY);
-            
+
         }
 
 
@@ -48,7 +45,7 @@ namespace KnightsTour
         public void FindKT()
         {
             _boardGrid.SetGrid(-1);
-            _boardGrid.SetCurrent(_boardGrid.StartLocation,0);
+            _boardGrid.SetCurrent(_boardGrid.StartLocation, 0);
             //_startLocation = _boardGrid.StartLocation;
             //_boardGrid.SetMoveOrder(0); //start is visited
             //recursively try all possible legal moves. Backtrack on dead end solutions.
@@ -59,15 +56,38 @@ namespace KnightsTour
             else
             {
                 _boardGrid.PrintBoard();
+                //_boardGrid.PrintQuadrants();
                 Console.WriteLine("Ending_lastSquare {0}", _lastSquare.MyToString());
                 Console.WriteLine("Total profit: {0:N2}", _boardGrid.CalcProfit());
-                //if (_isClosingSquare(_lastSquare))
-                //    Console.WriteLine("Closed tour");
-                //else
-                //    Console.WriteLine("Open tour");
                 Console.WriteLine("Total attempted moves {0}", attemptedMoves);
+                Console.WriteLine("  ");
+                //starting quad
+                Console.WriteLine($"Starting:{_boardGrid.GetStartingQuad()}");
+
             }
         }
+
+
+        public void FindQuadPath()
+        {
+            //path from stating point to ending point with most profit.
+            //leetcode 1219
+            //maxST
+            //sort squares
+            _boardGrid.SetGrid(-1);
+            _boardGrid.SetCurrent(_boardGrid.StartLocation, 0);
+            Console.WriteLine($"Starting:{_boardGrid.GetStartingQuad()}");
+            List<Square> test = _boardGrid.Quadrants[0].SortSquares(_boardGrid);
+            foreach (var item in test)
+            {
+                Console.WriteLine(item.Profit);
+            }
+
+
+            //createMST
+            
+        }
+
 
 
         private bool solveKTUtil(Board board, int moveCount)
@@ -100,7 +120,7 @@ namespace KnightsTour
             {
                 if (!board.GetSquareByPosition(move).IsVisited)
                 {
-                    board.SetCurrent(move,moveCount);
+                    board.SetCurrent(move, moveCount);
                     if (solveKTUtil(board, moveCount + 1))
                         return true;
                     else
@@ -108,60 +128,9 @@ namespace KnightsTour
                 }
             }
 
-            //for (int k = 0; k < 8; k++)
-            //{
-            //    next_move = square.Add(KnightMoves[k]);
-
-            //    if (_boardGrid.safeSquare(next_move))
-            //    {
-            //        _boardGrid.SetMoveOrder(next_move, moveCount);
-            //        if (solveKTUtil(next_move, moveCount + 1))
-            //            return true;
-            //        else
-            //            _boardGrid.SetMoveOrder(next_move,-1);
-            //    }
-            //}
             return false;
         }
 
-        public void PrintMoves()
-        {
-            foreach (var item in _boardGrid.Grid)
-            {
-                item.PrintMoves();
-            }
-        }
 
-        //public void TestLandingSquare()
-        //{
-        //    List<Coord> t1 = LandingSquares(sf.GetNewCoord(4,4));
-        //    foreach (Coord item in t1)
-        //        Console.WriteLine(item.MyToString());
-        //}
-
-        //private List<Coord> LandingSquares(Coord startSquare)
-        //{
-        //    List<Coord> moves = new();
-
-        //    for (int k = 0; k < 8; k++)
-        //    {
-        //        Coord nextSq = startSquare.Add(KnightMoves[k]);
-        //        if (_boardGrid.validSquare(nextSq))
-        //            moves.Add(nextSq);
-        //    }
-        //    return moves;
-        //}
-        //private bool _isClosingSquare(Coord candidate)
-        //{
-        //    foreach (var square in LandingSquares(_startSquare))
-        //    {
-        //        if (square.IsEqual(candidate))
-        //        {
-        //            return true;
-        //        }
-        //    }
-        //    return false;
-        //}
     }
 }
-
