@@ -9,6 +9,8 @@ namespace KnightsTour
 {
     internal class CityBackTrack
     {
+        private int NUM_OF_CITIES = 200;
+        
         private int attemptedMoves = 0;
         private int _startLocation = 1;
         private int[] _visited;
@@ -18,9 +20,10 @@ namespace KnightsTour
 
         public CityBackTrack()
         {
-            _blankArr = new int[244, 244];
+            _blankArr = new int[NUM_OF_CITIES, NUM_OF_CITIES];
             //fill with 1's
             _mockAllJoined = Fill2DArray(_blankArr, 1);
+            Print2DArray(_mockAllJoined);
         }
 
         public void FindTour()
@@ -30,7 +33,7 @@ namespace KnightsTour
             //    if (!FindTourFrom(i)) continue;
             //    else return;
             //}
-            FindTourFrom(6);
+            //FindTourFrom(6);
             
         }
 
@@ -51,7 +54,7 @@ namespace KnightsTour
             //_boardGrid.SetCurrent(_boardGrid.StartLocation, 0);
             _startLocation = start;
             //_boardGrid.SetMoveOrder(0); //start is visited
-            _visited = new int[244];
+            _visited = new int[NUM_OF_CITIES];
             _visited[_startLocation] = 1;
             //recursively try all possible legal moves. Backtrack on dead end solutions.
 
@@ -87,7 +90,7 @@ namespace KnightsTour
             //check to see if we have solved the game.
 
 
-            if (moveCount == 244)
+            if (moveCount == NUM_OF_CITIES)
             {
                 return true;
             }
@@ -112,10 +115,10 @@ namespace KnightsTour
 
         int[] getConnections(int city)
         {
-            var result = new int[244];
+            var result = new int[NUM_OF_CITIES];
             for (int i = 0;i < result.Length; i++)
             {
-                //result[i] = CityAdjacencyMatrix.c[city, i];
+                //result[i] = CityAdjacencyMatrix.c_200[city, i];
                 result[i] = _mockAllJoined[city, i];
             }
             return result;
@@ -136,11 +139,12 @@ namespace KnightsTour
         {
             for (int i = 0; i < arr.GetLength(0); i++)
             {
-                Console.WriteLine(i.ToString());
+                Console.Write($"{i.ToString("000")}:");
                 for (int j = 0; j < arr.GetLength(1); j++)
                 {
-                    Console.Write($", {arr[i, j]}");
+                    Console.Write($"{arr[i, j]}");
                 }
+                Console.WriteLine();
             }
         }
     }

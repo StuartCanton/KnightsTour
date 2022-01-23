@@ -80,8 +80,6 @@ namespace KnightsTour
                         return true;
                     else
                         boardGrid[next_x, next_y] = -1;
-
-
                 }
             }
             return false;
