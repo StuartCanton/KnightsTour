@@ -37,10 +37,7 @@ namespace KnightsTour
             rf = new(af);
             qf = new(rf,af);
             bf = new(sf,qf, r);
-
-
-            _boardGrid = bf.GetBoard(boardSize, startX, startY);
-            
+            _boardGrid = bf.GetBoard(boardSize, startX, startY);          
         }
 
 
